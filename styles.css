@@ -241,6 +241,12 @@ textarea {
   color: var(--accent-dark);
 }
 
+.icon-button:disabled,
+.text-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .hint {
   margin-top: 10px;
   font-size: 0.9rem;
@@ -338,6 +344,48 @@ body.theme-party pre {
 .review-panel h2 {
   color: var(--ink);
   margin-bottom: 8px;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 280px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--field);
+}
+
+.preview-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.preview-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-legend i {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.preview-legend .rapid {
+  background: #9ca3af;
+}
+
+.preview-legend .feed {
+  background: #0f766e;
+}
+
+.preview-legend .arc {
+  background: #d97706;
 }
 
 ul {

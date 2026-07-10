@@ -1,5 +1,6 @@
 import { fmt } from "./number-format.js";
 import { parseHolePairs, parseInstructionLines, parsePair, parseSize, parseValue } from "./parser.js";
+import { validateInstructions, validateSettings } from "./validation.js";
 
 function depths(targetDepth, stepdown) {
   const depth = -Math.abs(targetDepth);
@@ -195,13 +196,14 @@ export function generateLatheOp(line, settings, warnings) {
 
 export function generateProgram(instructions, settings) {
   const warnings = [
-    { level: "critical", text: "Do not run this directly on a machine. Backplot, single-step in air, and verify against your Sherline controller/manual first." },
+    { level: "normal", text: "Do not run this directly on a machine. Backplot, single-step in air, and verify against your Sherline controller/manual first." },
     { level: "normal", text: "Assumes G54 work offset, absolute positioning, conventional X/Y/Z mill axes, and LinuxCNC/RS274-style syntax." },
     { level: "normal", text: "Tool diameter compensation is intentionally not applied; offset your geometry or add G41/G42 only after verifying lead-in moves." }
   ];
   if (settings.machine === "lathe") {
     warnings.push({ level: "normal", text: "Lathe output assumes X is diameter mode; confirm G7/G8 behavior on your controller before cutting." });
   }
+  warnings.push(...validateSettings(settings), ...validateInstructions(instructions));
 
   const body = parseInstructionLines(instructions).flatMap((line) => (
     settings.machine === "lathe"

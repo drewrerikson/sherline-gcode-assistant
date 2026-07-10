@@ -1,7 +1,9 @@
 import { examples } from "./examples.js";
 import { generateProgram } from "./gcode.js";
+import { renderPreview } from "./preview.js";
 import { normalizeSettings, settingFieldIds } from "./settings.js";
 import { applyTheme, loadTheme } from "./theme.js";
+import { hasCriticalWarnings } from "./validation.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -32,7 +34,13 @@ function renderWarnings(warnings) {
 function renderProgram() {
   const result = generateProgram($("instructions").value, readSettings());
   $("output").textContent = result.gcode;
+  renderPreview($("preview"), result.gcode);
   renderWarnings(result.warnings);
+  const blocked = hasCriticalWarnings(result.warnings);
+  $("copyButton").disabled = blocked;
+  $("downloadButton").disabled = blocked;
+  $("copyButton").title = blocked ? "Resolve critical review items before copying" : "Copy G-code";
+  $("downloadButton").title = blocked ? "Resolve critical review items before saving" : "Save .ngc";
 }
 
 function saveFile() {
@@ -61,6 +69,7 @@ function bindEvents() {
   });
   $("exampleButton").addEventListener("click", loadExample);
   $("machine").addEventListener("change", loadExample);
+  window.addEventListener("resize", renderProgram);
 }
 
 export function startApp() {

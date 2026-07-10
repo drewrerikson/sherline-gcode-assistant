@@ -66,3 +66,37 @@ test("reports unsupported instructions without throwing", () => {
   assert.match(result.gcode, /\(engrave my initials\)/);
   assert.ok(result.warnings.some((warning) => warning.level === "critical" && warning.text.includes("Unsupported mill instruction")));
 });
+
+test("flags empty instructions as critical", () => {
+  const result = generateProgram("", millSettings());
+
+  assert.ok(result.warnings.some((warning) => warning.level === "critical" && warning.text.includes("Enter at least one instruction")));
+});
+
+test("flags unsafe numeric settings as critical", () => {
+  const result = generateProgram(
+    "drill holes at x0 y0 depth 0.1",
+    millSettings({ feed: 0, plunge: -1, rpm: 0, safe: 0, stepdown: 0, tool: 0 })
+  );
+
+  assert.ok(result.warnings.some((warning) => warning.text.includes("Feed rate must be greater than zero")));
+  assert.ok(result.warnings.some((warning) => warning.text.includes("Plunge rate must be greater than zero")));
+  assert.ok(result.warnings.some((warning) => warning.text.includes("Spindle RPM must be greater than zero")));
+  assert.ok(result.warnings.some((warning) => warning.text.includes("Safe height must be greater than zero")));
+  assert.ok(result.warnings.some((warning) => warning.text.includes("Stepdown must be greater than zero")));
+  assert.ok(result.warnings.some((warning) => warning.text.includes("Tool number must be a positive whole number")));
+});
+
+test("does not emit non-finite values for default normalized settings", () => {
+  const result = generateProgram("mill a circle diameter 0.5 depth 0.04 at x0 y0", millSettings());
+
+  assert.doesNotMatch(result.gcode, /NaN|Infinity|undefined/);
+});
+
+test("warns about suspicious unit and feed combinations", () => {
+  const inchResult = generateProgram("drill holes at x0 y0 depth 0.1", millSettings({ feed: 100 }));
+  const mmResult = generateProgram("drill holes at x0 y0 depth 2", millSettings({ units: "mm", feed: 1 }));
+
+  assert.ok(inchResult.warnings.some((warning) => warning.text.includes("high for inch mode")));
+  assert.ok(mmResult.warnings.some((warning) => warning.text.includes("low for millimeter mode")));
+});
