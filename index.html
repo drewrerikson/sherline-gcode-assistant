@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sherline G-code Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <h1>Sherline G-code Assistant</h1>
+            <p>Translate simple shop instructions into conservative LinuxCNC-style G-code templates.</p>
+          </div>
+          <div class="topbar-actions" aria-label="App actions">
+            <div class="theme-control" aria-label="Theme">
+              <button class="theme-button active" type="button" data-theme="light">Light</button>
+              <button class="theme-button" type="button" data-theme="dark">Dark</button>
+              <button class="theme-button" type="button" data-theme="party">Party</button>
+            </div>
+            <button id="copyButton" class="icon-button" title="Copy G-code" aria-label="Copy G-code">
+              <span aria-hidden="true">Cp</span>
+            </button>
+          </div>
+        </header>
+
+        <section class="panel setup-panel" aria-label="Machine setup">
+          <div class="field">
+            <label for="machine">Machine</label>
+            <select id="machine">
+              <option value="mill">Sherline mill</option>
+              <option value="lathe">Sherline lathe</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="units">Units</label>
+            <select id="units">
+              <option value="inch">Inches</option>
+              <option value="mm">Millimeters</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="feed">Feed</label>
+            <input id="feed" type="number" step="0.1" value="4">
+          </div>
+          <div class="field">
+            <label for="plunge">Plunge</label>
+            <input id="plunge" type="number" step="0.1" value="1">
+          </div>
+          <div class="field">
+            <label for="rpm">RPM</label>
+            <input id="rpm" type="number" step="100" value="1800">
+          </div>
+          <div class="field">
+            <label for="safe">Safe height</label>
+            <input id="safe" type="number" step="0.01" value="0.1">
+          </div>
+          <div class="field">
+            <label for="stepdown">Stepdown</label>
+            <input id="stepdown" type="number" step="0.01" value="0.02">
+          </div>
+          <div class="field">
+            <label for="tool">Tool</label>
+            <input id="tool" type="number" step="1" value="1">
+          </div>
+        </section>
+
+        <section class="editor-grid">
+          <div class="panel">
+            <div class="section-heading">
+              <h2>Instructions</h2>
+              <button id="exampleButton" class="text-button">Example</button>
+            </div>
+            <textarea id="instructions" spellcheck="false">mill a rectangle 1.0 x 0.5 depth 0.05 at x0 y0
+drill holes at x0.25 y0.25 and x0.75 y0.25 depth 0.125</textarea>
+            <div class="hint">
+              Try commands like: face stock, drill holes at x0 y0 depth 0.2, mill a circle diameter 0.5 depth 0.04, turn diameter 0.5 length 1.0.
+            </div>
+          </div>
+
+          <div class="panel output-panel">
+            <div class="section-heading">
+              <h2>Generated G-code</h2>
+              <button id="downloadButton" class="text-button">Save .ngc</button>
+            </div>
+            <pre id="output" aria-live="polite"></pre>
+          </div>
+        </section>
+
+        <section class="panel review-panel">
+          <h2>Review</h2>
+          <ul id="warnings"></ul>
+        </section>
+      </section>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
